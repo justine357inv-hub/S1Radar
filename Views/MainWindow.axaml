@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="S1Radar.Views.MainWindow" Width="1400" Height="860" MinWidth="1050" MinHeight="700" Title="S1Radar — Source 1 Multi-Level Radar">
+  <Grid RowDefinitions="Auto,*" ColumnDefinitions="340,*">
+    <Border Grid.ColumnSpan="2" Padding="18,14" Background="#15181D">
+      <Grid ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+        <StackPanel><TextBlock Text="S1Radar" FontSize="27" FontWeight="Bold"/><TextBlock Text="Source 1 VMF → multi-level tactical radar" Opacity=".62"/></StackPanel>
+        <Button Grid.Column="1" Name="OpenButton" Content="OPEN VMF" Width="125" Height="38" Margin="8,0" Click="OpenClick"/>
+        <Button Grid.Column="2" Name="ExportButton" Content="EXPORT" Width="125" Height="38" Margin="8,0,0,0" Click="ExportClick"/>
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="1" Padding="16" Background="#111318">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="11">
+          <TextBlock Name="FileLabel" Text="No map loaded" TextWrapping="Wrap" FontWeight="SemiBold"/>
+          <Button Content="ANALYZE + RENDER" Height="40" Click="AnalyzeClick"/>
+          <Separator/>
+          <TextBlock Text="LEVELS" FontSize="11" Opacity=".6"/>
+          <ItemsControl Name="LevelsList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Background="#191D23" Padding="9" Margin="0,2" CornerRadius="5">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <CheckBox IsChecked="True" Name="LevelVisible" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                      <TextBlock Text="{Binding Range}" Opacity=".55" FontSize="11"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding SurfaceCount}" VerticalAlignment="Center" Opacity=".6"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Name="Stats" TextWrapping="Wrap" Opacity=".7"/>
+          <Separator/>
+          <TextBlock Text="OUTPUT" FontSize="11" Opacity=".6"/>
+          <ComboBox Name="Resolution" SelectedIndex="1"><ComboBoxItem>512 × 512</ComboBoxItem><ComboBoxItem>1024 × 1024</ComboBoxItem><ComboBoxItem>2048 × 2048</ComboBoxItem></ComboBox>
+          <CheckBox Name="ShowMarkers" Content="Show tactical markers" IsChecked="True"/>
+          <TextBlock Text="S1 VISGROUPS" FontSize="11" Opacity=".6" Margin="0,8,0,0"/>
+          <TextBlock Text="s1_path\ns1_cover\ns1_overlap\ns1_remove\ns1_wall\ns1_detail\ns1_ramp\ns1_stairs\ns1_door\ns1_objective\ns1_spawn\ns1_buyzone" FontFamily="Consolas" Opacity=".65"/>
+          <TextBlock Name="Status" Text="Open a .vmf to begin." TextWrapping="Wrap" Margin="0,8,0,0"/>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <Border Grid.Column="1" Grid.Row="1" Margin="14" Background="#080A0D" CornerRadius="8" Padding="8">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
+        <Image Name="Preview" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</Window>

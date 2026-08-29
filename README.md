@@ -1,6 +1,6 @@
 # S1Radar
 
-S1Radar is a .NET 8 desktop application for generating Counter-Strike: Source overview radars from Hammer/Hammer++ VMF files. It reconstructs Source brush geometry with native C# math, analyzes surfaces and elevation, classifies tactical geometry, and rasterizes a clean 2D radar with SkiaSharp.
+S1Radar is a .NET 8 desktop application for generating Counter-Strike: Source overview radars from Hammer/Hammer++ VMF files. The core is a native Source geometry pipeline that reconstructs convex brushes, analyzes surfaces by elevation, preserves multi-level overlap, and rasterizes a clean tactical vector scene.
 
 ## S1 VisGroups
 
@@ -21,14 +21,16 @@ s1_spawn
 s1_buyzone
 ```
 
-`S1Radar` does not require these tags for basic automatic analysis. When present, they act as explicit classification overrides. `s1_remove` is an explicit exclusion.
+`S1Radar` never requires these tags for basic automatic analysis. When present, they act as explicit classification overrides. `s1_remove` is an explicit exclusion.
 
-## Geometry pipeline
+## Multi-level analysis
+
+The integrated pipeline is:
 
 ```text
 VMF
  ↓
-KeyValues + Hammer metadata
+KeyValues + Hammer VisGroup model
  ↓
 Convex brush CSG reconstruction
  ↓
@@ -36,40 +38,50 @@ Surface extraction
  ↓
 Slope / ramp / stair classification
  ↓
-Elevation and floor analysis
+Elevation clustering into independent levels
  ↓
 Walkability + connectivity analysis
  ↓
-Tactical entity extraction
+Tactical marker extraction
  ↓
 Level-aware vector scene
+ ↓
+Compatible polygon union during rasterization
  ↓
 SkiaSharp rendering
  ↓
 PNG + CS:S TXT + VMT
 ```
 
-The current renderer keeps elevation and level information in the scene model so geometry can be composed intelligently while still producing a single overview image.
-
-## Dependencies
-
-The project uses:
-
-- Avalonia 11.3.2
-- Avalonia.Skia 11.3.2
-- SkiaSharp 3.119.0
-- .NET 8
-
-The project intentionally does **not** reference `SkiaSharp.Views.Avalonia`; S1Radar renders directly into `SKBitmap` and feeds the encoded PNG into the Avalonia image control.
+Overlapping XY geometry is not merged solely by XY position. Each surface retains its level assignment and elevation range. Upper levels can therefore be rendered independently over lower levels. Every detected level has its own `LevelStyle` entry, so low/high colors, opacity, and visibility can be changed independently in code and future UI controls.
 
 ## Build on Windows
 
-Double-click `build-windows.bat` for an x86 self-contained Windows build. The builder checks common .NET locations first, including the x86 installation directory, and can fall back to Microsoft's official .NET install script.
+Install the .NET 8 SDK or simply run `build-windows.bat`. The builder first looks for any installed .NET 8 SDK, including SDKs such as `8.0.424`. If it cannot find one, it downloads Microsoft's official `dotnet-install.ps1` and installs a private x64 .NET 8 SDK under `.dotnet` next to the project. No system-wide .NET install is required for that fallback.
 
-For GitHub Actions, the repository includes:
+Normal development:
 
-```text
-.github/workflows/build-windows.yml
+```powershell
+dotnet restore
+dotnet build -c Release
+dotnet run -c Release
 ```
 
-Run it from GitHub Actions to produce `S1Radar-Windows-x86.zip`.
+Self-contained Windows build:
+
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+```
+
+## GitHub Actions build
+
+This repository includes `.github/workflows/build-windows.yml`. It builds the project on a GitHub-hosted Windows runner and publishes a self-contained `win-x86` single-file executable.
+
+In GitHub:
+
+1. Upload the contents of the `S1Radar` folder to a repository.
+2. Commit the `.github/workflows/build-windows.yml` file.
+3. Open **Actions** → **Build S1Radar Windows x86** → **Run workflow**.
+4. When the run finishes, download the **S1Radar-Windows-x86** artifact.
+
+The artifact is a ZIP containing `S1Radar.exe` for 32-bit Windows.
