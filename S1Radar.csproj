@@ -14,7 +14,7 @@
     <PackageReference Include="Avalonia" Version="11.3.2" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
-    <PackageReference Include="SkiaSharp.Views.Avalonia" Version="11.3.2" />
     <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="SkiaSharp.Views.Avalonia" Version="11.3.0.1" />
   </ItemGroup>
 </Project>
